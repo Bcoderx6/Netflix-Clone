@@ -1,0 +1,1 @@
+My DevOps setup for the Netflix clone project includes automated CI/CD using GitHub Actions for code analysis and security scans with SonarQube and Trivy. The project is deployed on DigitalOcean cloud infrastructure, showcasing expertise in DevOps practices for efficient and secure software development.
