@@ -1,30 +1,36 @@
-name: Build,Analyze,scan
+name: Build, Analyze, and Scan
 on:
   push:
     branches:
       - main
+
 jobs:
   build-analyze-scan:
-    name: Build
+    name: Build, Analyze, and Scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
       - name: Build and analyze with SonarQube
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-          - name: install trivy
-  run: |
-    #install trivy
-    sudo apt-get install wget apt-transport-https gnupg lsb-release -y
-    wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
-    echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
-    sudo apt-get update
-    sudo apt-get install trivy -y
-    #command to scan files
-    trivy fs .
+      - name: Install Trivy
+        run: |
+          # Install Trivy
+          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --dearmor -o /usr/share/keyrings/trivy.gpg
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install -y trivy
+
+      - name: Scan for vulnerabilities
+        run: |
+          # Command to scan files
+          trivy fs .
