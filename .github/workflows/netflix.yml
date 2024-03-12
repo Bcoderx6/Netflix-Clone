@@ -1,4 +1,4 @@
-name: Build, Analyze, and Scan
+name: Build, Analyze, Scan, and Deploy
 on:
   push:
     branches:
@@ -44,3 +44,14 @@ jobs:
           docker push mryash/netflix:latest
         env:
           DOCKER_CLI_ACI: 1
+
+  deploy:
+    needs: build-analyze-scan
+    runs-on: self-hosted  # Replace with appropriate runner label
+    steps:
+      - name: Pull the docker image
+        run: docker pull mryash/netflix:latest
+      - name: Trivy image scan
+        run: trivy image mryash/netflix:latest
+      - name: Run the container netflix
+        run: docker run -d --name netflix -p 8081:80 mryash/netflix:latest
